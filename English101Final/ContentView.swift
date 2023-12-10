@@ -23,6 +23,29 @@ struct ContentView: View {
     var background: some View {
         ZStack {
 //            Color.black
+            VStack {
+                HStack {
+                    Circle()
+                        .fill(Color.teal)
+                        .frame(width: 100, height: 100)
+                        .offset(x: !showGuide ? 300:0)
+                        .animation(.linear(duration: 10).repeatForever(autoreverses: true), value: showGuide)
+                        .blur(radius: 100)
+
+                    Spacer()
+                }
+                Spacer()
+                HStack {
+                    Spacer()
+                    Circle()
+                        .fill(Color.pink)
+                        .frame(width: 100, height: 100)
+                        .offset(x: !showGuide ? -300:0)
+                        .animation(.linear(duration: 10).repeatForever(autoreverses: true), value: showGuide)
+                        .blur(radius: 100)
+
+                }
+            }
             if selected?.title == "The good" {
                 Color.green.opacity(0.2)
             } else if selected?.title == "The bad" {
@@ -53,14 +76,14 @@ struct ContentView: View {
     var body: some View {
         
         ZStack {
-        
+            ZStack {
                 background
                     .ignoresSafeArea()
-            if !shouldBegin {
-                onBoarding
-            } else {
-                discussionView
-            }
+                if !shouldBegin {
+                    onBoarding
+                } else {
+                    discussionView
+                }
                 /*
                  TabView(selection: $selection) {
                  
@@ -69,8 +92,46 @@ struct ContentView: View {
                  }
                  ignoresSafeArea()
                  */
+                
+            }
+            .blur(radius: (showGuide ? 10:0))
+            .onTapGesture {
+                if showGuide {
+                    withAnimation(.spring()) {
+                        showGuide = false
+                    }
+                }
+            }
+            VStack(alignment: .leading) {
+                
+                    Text("Usage Guide")
+                    .font(.title3.bold())
+                    .padding(.bottom)
+                    Text("This app is designed for the sole purpose of fufilling an English 101 Assignment and should not be used as official documentation. It is intended to meet the assignment requirements of forming a thesis on a argumentative topic, developing it and expressing it in multiple forms of media rather than the general text form.\n\n This app is designed in a social form, where fictional users create a balanced discussion over the subject 'My Second Amendment'\n\nMany UI Elements do not work, that's on a purpose, a greater part of this app is to mimic a discursive social platform.\n\n 1. Scroll through all posts by scrolling up and down.\n\n2. Click a post to view it more in detail")
+                
+                Button {
+                    withAnimation(.spring()) {
+                        showGuide = false
+                    }
+                } label: {
+                    Text("Understood")
+                        .font(.title3.bold())
+                        .padding(10)
+                        .frame(maxWidth: .infinity)
+                        .background(.linearGradient(colors: [.orange, .pink], startPoint: .topLeading, endPoint: .bottomTrailing))
+                        .clipShape(.rect(cornerRadius: 12, style: .continuous))
+                }
+                .foregroundStyle(.white)
+            }
+            .padding()
+            .background(Color.white)
+            .clipShape(.rect(cornerRadius: 22, style: .continuous))
+            .shadow(color: Color.black.opacity(0.3), radius: 20, x: 2, y: 7)
+            .offset(y: showGuide ? 0:1000)
+            .padding(40)
             }
         }
+    @State var showGuide = false
     
     var discussionView: some View {
         GeometryReader {
@@ -79,7 +140,7 @@ struct ContentView: View {
             ScrollView {
                 
                 VStack(spacing: 0) {
-                    Text("Write an argument based on the second amendment, one response should discuss the what it is, why, pros, cons. If there are statistics, show us thorough chats that presents the numbers in a visual manner.")
+                    Text("Discussion Prompt:\n\n'Write an argument based on the second amendment, one response should discuss the what it is, why, pros, cons.'\n\nCreated Friday, Dec 8th 2023")
                         .font(.subheadline.bold())
                         .multilineTextAlignment(.leading)
                         .italic()
@@ -96,8 +157,7 @@ struct ContentView: View {
                                         .ignoresSafeArea()
                                 }
                                 VStack {
-                                    Divider()
-                                        .padding(10)
+                                  
                                     HStack {
                                         Image(systemName: "person.fill")
                                             .font(.title3)
@@ -133,7 +193,7 @@ struct ContentView: View {
                                         VStack {
                                             HStack {
                                                 Text(post.title)
-                                                    .font(selected == post ? .largeTitle:.title)
+                                                    .font(.title)
                                                     .bold()
                                                 Spacer()
                                             }
@@ -152,6 +212,12 @@ struct ContentView: View {
                                                 .matchedGeometryEffect(id: "namespace-\(selected.id )", in: namespace)
                                                 
                                             }
+                                            
+                                            if post.title == "The bad" {
+                                                
+                                                
+                                            }
+                                            
                                             Text(post.body)
                                                 .lineLimit(selected == post ? nil:3)
                                         }
@@ -196,9 +262,11 @@ struct ContentView: View {
                         .padding()
                     
                     VStack(alignment: .leading) {
-                        Text("Sources")
+                        Text("Shared Sources")
                             .font(.title.bold())
-                        Text("Campbell, Jeffrey P. Bachelor of Arts in History Oklahoma State University, Stillwater, Oklahoma, 2009.\n\nNational Institute of Justice. 'Gun Violence in America.' U.S. Department of Justice, https://nij.ojp.gov/topics/articles/gun-violence-america.\n\nRegent University Law Review. 'Issues in the Second Amendment. Volume 6, 2009, pp. 261-284. https://www.regent.edu/acad/schlaw/student_life/studentorgs/lawreview/docs/issues/v6/6RegentULRev261.pdf.\n\nLee, Mike. 'Protect 2A.' Senator Mike Lee, https://www.lee.senate.gov/protect-2a.")
+                        Text("Note these sources are for the entire assignment")
+                            .font(.caption)
+                        Text("Campbell, Jeffrey P. Bachelor of Arts in History Oklahoma State University, Stillwater, Oklahoma, 2009.\n\nNational Institute of Justice, 'Gun Violence in America,' February 26, 2019, nij.ojp.gov:https://nij.ojp.gov/topics/articles/gun-violence-america\n\nRegent University Law Review. 'Issues in the Second Amendment. Volume 6, 2009, pp. 261-284. https://www.regent.edu/acad/schlaw/student_life/studentorgs/lawreview/docs/issues/v6/6RegentULRev261.pdf.\n\nLee, Mike. 'Protect 2A.' Senator Mike Lee, https://www.lee.senate.gov/protect-2a.")
                             .multilineTextAlignment(.leading)
                     }
                     .padding()
@@ -212,7 +280,7 @@ struct ContentView: View {
                     Text("Discussion Board")
                         .font(.title.bold())
                     Spacer()
-                    if let selected  {
+                    if selected != nil  {
                         Image(systemName: "xmark")
                             .font(.largeTitle.bold())
                             .foregroundStyle(.red)
@@ -224,9 +292,15 @@ struct ContentView: View {
                             }
                         
                     } else {
-                        Label("Guide", systemImage: "questionmark.circle.fill")
-                            .font(.title3.bold())
-                            .foregroundStyle(.pink)
+                        Button {
+                            withAnimation(.spring()) {
+                                showGuide.toggle()
+                            }
+                        } label: {
+                            Label("Guide", systemImage: "questionmark.circle.fill")
+                                .font(.title3.bold())
+                                .foregroundStyle(.pink)
+                        }
                     }
                 }
                 .padding()
@@ -279,8 +353,9 @@ struct ContentView: View {
             
             
             Button {
-                withAnimation(.easeInOut(duration: 5)) {
+                withAnimation(.easeInOut(duration: 1)) {
                     shouldBegin = true
+                    showGuide = true
                 }
             } label: {
                 Label("Begin", systemImage: "circle.circle")
